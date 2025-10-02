@@ -63,38 +63,47 @@ This project is an end-to-end data analysis solution designed to extract critica
    
 
 ## Important Questions......
+**Task 2: Create a New Book Record**
+```sql
 
--- 
-Count total records
+INSERT INTO Books
+VALUES ('978-1-60129-456-2', 'To Kill a Mockingbird', 'Classic', 6.0, 'yes', 'Harper Lee', 'J.B. Lippincott & Co.');
+```
+**Count total records**
+```sql
 SELECT COUNT(*) FROM walmart;
-
--- Show payment methods and number of transactions by payment method
-
+```
+**Show payment methods and number of transactions by payment method**
+```sql
 SELECT 
     payment_method,
     COUNT(*) AS no_payments
 FROM walmart
 GROUP BY payment_method;
-
--- Count distinct branches
+```
+**Count distinct branches**
+```sql
 SELECT COUNT(DISTINCT branch) 
 FROM walmart;
-
--- Find the minimum quantity sold
+```
+**Find the minimum quantity sold**
+```sql
 SELECT category,MIN(quantity) 
 FROM walmart
 GROUP BY category;
-
--- Business Problem Q1: Find different payment methods, number of transactions, and quantity sold by payment method
+```
+**Business Problem Q1: Find different payment methods, number of transactions, and quantity sold by payment method**
+```sql
 SELECT 
     payment_method,
     COUNT(*) AS no_payments, 
     SUM(quantity) AS no_qty_sold
 FROM walmart
 GROUP BY payment_method;
-
--- Project Question #2: Identify the highest-rated category in each branch
--- Display the branch, category, and avg rating
+```
+**Project Question #2: Identify the highest-rated category in each branch**
+**Display the branch, category, and avg rating**
+```sql
 SELECT branch, category, avg_rating
 FROM (
     SELECT 
@@ -106,9 +115,10 @@ FROM (
     GROUP BY branch, category
 ) AS ranked
 WHERE ran_k = 1;
+```
 
-
--- Q3: Identify the busiest day for each branch based on the number of transactions
+**Q3: Identify the busiest day for each branch based on the number of transactions**
+```sql
 SELECT branch, day_name, no_transactions
 FROM (
     SELECT 
@@ -120,15 +130,17 @@ FROM (
     GROUP BY branch, day_name
 ) AS ranked
 WHERE ran_k = 1;
-
--- Q4: Calculate the total quantity of items sold per payment method
+```
+**Q4: Calculate the total quantity of items sold per payment method**
+```sql
 SELECT 
     payment_method,
     SUM(quantity) AS no_qty_sold
 FROM walmart
 GROUP BY payment_method;
 
--- Q5: Determine the average, minimum, and maximum rating of categories for each city
+**Q5: Determine the average, minimum, and maximum rating of categories for each city**
+```sql
 SELECT 
     city,
     category,
@@ -137,19 +149,18 @@ SELECT
     AVG(rating) AS avg_rating
 FROM walmart
 GROUP BY city, category;
-
--- Q6: Calculate the total profit for each category
+```
+**Q6: Calculate the total profit for each category**
+```sql
 SELECT 
     category,
     SUM(unit_price * quantity * profit_margin) AS total_profit
 FROM walmart
 GROUP BY category
 ORDER BY total_profit DESC;
-
- /* Q7: Branch Comparison
-Which branch performs best in terms of revenue and average customer rating? */
-
--- Q8: Determine the most common payment method for each branch
+```
+**Q7: Determine the most common payment method for each branch**
+```sql
 WITH cte AS (
     SELECT 
         branch,
@@ -162,7 +173,9 @@ WITH cte AS (
 SELECT branch, payment_method AS preferred_payment_method
 FROM cte
 WHERE ran_k = 1;
--- second approach ----------
+```
+**second approach ----------**
+```sql
 select branch, payment_method
 from(select branch, payment_method, 
 count(payment_method),
@@ -170,12 +183,12 @@ rank() over( partition by branch order by count(payment_method) desc) as ran
 from walmart
 group by branch, payment_method)as ranked
 where ran =1;
+```
+## Advanced Level (Business Insights) ----
 
-     
--- Advanced Level (Business Insights) ----
-
-/* Q9: Profitability Analysis
-Which product category has the highest average profit margin across branches? */
+**Q8: Profitability Analysis**
+**Which product category has the highest average profit margin across branches?**
+```sql
 SELECT branch, category, AVG(profit_margin)
 FROM(
 	SELECT branch, category, AVG(profit_margin),
@@ -193,8 +206,9 @@ FROM walmart w
 JOIN category_avg c
 ON w.category = c.category
 WHERE c.avg_profit_margin = (SELECT MAX(avg_profit_margin) FROM category_avg);
-
--- Q10: Categorize sales into Morning, Afternoon, and Evening shifts
+```
+**Q9: Categorize sales into Morning, Afternoon, and Evening shifts**
+```sql
 SELECT
     branch,
     CASE 
@@ -206,25 +220,28 @@ SELECT
 FROM walmart
 GROUP BY branch, shift
 ORDER BY branch, num_invoices DESC;
+```
 
-
-/* Q13: Branch-City InsightWhich city consistently brings in the highest profit margin for the company?*/
+**Q10: Branch-City InsightWhich city consistently brings in the highest profit margin for the company?**
+```sql
 SELECT city, AVG(profit_margin) AS avg_profit_margin
 FROM walmart
 GROUP BY city
 ORDER BY avg_profit_margin DESC
 LIMIT 1;
+```
 
-
-/* Q14: Branch Optimization
-If management wants to shut down the least profitable branch, which one should it be?*/
+**Q11: Branch Optimization**
+**If management wants to shut down the least profitable branch, which one should it be?**
+```sql
 SELECT branch, SUM(profit_margin) AS total_profit
 FROM walmart
 GROUP BY branch
 ORDER BY total_profit ASC
 LIMIT 1;
-
-/* Q15: Identify the 5 branches with the highest revenue decrease ratio from last year to current year (e.g., 2022 to 2023) */
+```
+**Q12: Identify the 5 branches with the highest revenue decrease ratio from last year to current year (e.g., 2022 to 2023)**
+```sql
 WITH revenue_2022 AS (
     SELECT 
         branch,
@@ -251,8 +268,8 @@ JOIN revenue_2023 AS r2023 ON r2022.branch = r2023.branch
 WHERE r2022.revenue > r2023.revenue
 ORDER BY revenue_decrease_ratio DESC
 LIMIT 5;
+```
 
----
 
 ## Requirements
 
